@@ -20,26 +20,26 @@ If you don't use MVC, obviously take that out.
 public void ConfigureServices(IServiceCollection services)
 {
     services.AddMvc();
-    services.AddAuthentication(sharedOptions =>
+    // If you don't manually specify the digest and signature algorithms, it'll fail.
+    var certificate = new X509Certificate2("IdentityServer4.WsFederation.Testing.pfx", "pw");
+    var signingCredentials = new SigningCredentials(new X509SecurityKey(certificate), SecurityAlgorithms.RsaSha256Signature, SecurityAlgorithms.Sha256Digest);
+
+    var builder = services.AddIdentityServer(options => 
     {
-        sharedOptions.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-        sharedOptions.DefaultChallengeScheme = WsFederationDefaults.AuthenticationScheme;
+        options.IssuerUri = "urn:idsrv4:wsfed:server:sample";
     })
-    .AddWsFederation(options =>
-    {
-        options.Wtrealm = "urn:idsrv4:wsfed:sample";
-        options.MetadataAddress = "http://localhost:63338/wsfederation/metadata";
-        options.RequireHttpsMetadata = false;
-        options.Wreply = "http://localhost:63307/signin-wsfed";
-    })
-    .AddCookie();
+    .AddSigningCredential(signingCredentials) // Must use this overload.
+    .AddTestUsers(TestUsers.Users)
+    .AddInMemoryClients(Clients.TestClients)
+    .AddInMemoryApiResources(new List<ApiResource>())
+    .AddWsFederation();
 }
 
 public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 {
-    // Other stuff abbreviated
-    app.UseAuthentication();
-    // app.UseMvc....
+    //OtherStuff
+    app.UseIdentityServer();
+    // app.UseMvc.....
 }
 ```
 
