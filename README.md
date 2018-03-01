@@ -61,6 +61,9 @@ Right now, this is basically in the POC state and is my first pass at getting a 
 * wresult
 * wctx
 
+## Something Vaguely Resembling a Roadmap
+I plan to do this stuff. I'll probably remember other things I want to do too.
+
 ### Top Priority Things
 These are the things that I'm planning on doing pretty soon.
 * I'm fairly certain I am doing Bad Stuff&trade; with the way I did some of the IdentityServer4-specific things.
