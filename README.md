@@ -82,3 +82,4 @@ These will mostly correspond to the parts of WsFederation that were not mentione
 * Rst as an input parameter.
 * Pointers to the incoming rst or outgoing rstr.
 * Encryption?
+* Different token types - SAML 1.1 vs SAML 2.0
