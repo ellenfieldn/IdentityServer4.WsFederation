@@ -2,8 +2,8 @@
 Full .Net Core implementation of WsFederation for IdentityServer4 and asp.net core. 
 
 I built this because:
-* Everything else i saw was targetted at .Net Framework
-* I wanted to be able to use WsFederation while targetting .net core.
+* Everything else i saw was targeted at .Net Framework
+* I wanted to be able to use WsFederation while targeting .net core.
 * I want it to be possible to deploy linux containers with a WsFederation Identity Provider.
 
 ## Getting Started
