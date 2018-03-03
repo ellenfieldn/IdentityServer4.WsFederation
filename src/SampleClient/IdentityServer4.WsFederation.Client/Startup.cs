@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.WsFederation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -22,6 +24,21 @@ namespace IdentityServer4.WsFederation.Client
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddAuthentication(sharedOptions =>
+            {
+                sharedOptions.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                sharedOptions.DefaultChallengeScheme = WsFederationDefaults.AuthenticationScheme;
+            })
+            .AddWsFederation(options =>
+            {
+                options.Wtrealm = "urn:idsrv4:wsfed:sample";
+                options.MetadataAddress = "http://localhost:63338/wsfederation/metadata";
+                //options.Wtrealm = "urn:aspnetcorerp";
+                //options.MetadataAddress = "http://localhost:5000/wsfederation";
+                options.RequireHttpsMetadata = false;
+                options.Wreply = "http://localhost:63307/signin-wsfed";
+            })
+            .AddCookie();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -38,7 +55,7 @@ namespace IdentityServer4.WsFederation.Client
             }
 
             app.UseStaticFiles();
-
+            app.UseAuthentication();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
