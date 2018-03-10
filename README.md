@@ -66,7 +66,6 @@ I plan to do this stuff.
 
 ### Top Priority Things
 These are the things that I'm planning on doing pretty soon.
-* Need to double check the way I did the asp.net core extensions. 
 * Need to make cookies configurable.
 * Need to figure out how I want to handle the awkwardness with the SigningCredentials. Short run, I can probably get a better solution. Long run, I think IdentityServer4 should probably make some small changes to their extensions. Need to understand better before I file an issue and potentially offer to "fix" it.
 
