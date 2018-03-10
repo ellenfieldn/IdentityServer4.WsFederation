@@ -62,14 +62,12 @@ Right now, this is basically in the POC state and is my first pass at getting a 
 * wctx
 
 ## Something Vaguely Resembling a Roadmap
-I plan to do this stuff. I'll probably remember other things I want to do too.
+I plan to do this stuff. 
 
 ### Top Priority Things
 These are the things that I'm planning on doing pretty soon.
-* I'm fairly certain I am doing Bad Stuff&trade; with the way I did some of the IdentityServer4-specific things.
 * Need to double check the way I did the asp.net core extensions. 
 * Need to make cookies configurable.
-* Need to at least make an effort to organize the files.
 * Need to figure out how I want to handle the awkwardness with the SigningCredentials. Short run, I can probably get a better solution. Long run, I think IdentityServer4 should probably make some small changes to their extensions. Need to understand better before I file an issue and potentially offer to "fix" it.
 
 ### Other things that are on the roadmap
@@ -78,7 +76,6 @@ These things are pretty much goals for the mid-term.
 * Supporting the rest of the easy parameters.
 * Better input validation.
 * Nuget package.
-* Logging.
 
 ### Long-term features
 These will mostly correspond to the parts of WsFederation that were not mentioned above.
