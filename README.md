@@ -81,6 +81,7 @@ These things are pretty much goals for the mid-term.
 * Better input validation.
 * Nuget package.
 * Logging.
+* Events.
 
 ### Long-term features
 These will mostly correspond to the parts of WsFederation that were not mentioned above.
