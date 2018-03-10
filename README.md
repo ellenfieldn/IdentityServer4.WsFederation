@@ -1,6 +1,8 @@
 # IdentityServer4.WsFederation
 Full .Net Core implementation of WsFederation for IdentityServer4 and asp.net core. 
 
+[![Build Status](https://ellenfieldn.visualstudio.com/_apis/public/build/definitions/6f83beb3-3c49-47b7-966c-8b7539f8c204/1/badge)](https://ellenfieldn.visualstudio.com/IdentityServer4.WsFederation/_build/index?&definitionId=1)
+
 I built this because:
 * Everything else i saw was targeted at .Net Framework
 * I wanted to be able to use WsFederation while targeting .net core.
@@ -75,6 +77,7 @@ These things are pretty much goals for the mid-term.
 * Supporting the rest of the easy parameters.
 * Better input validation.
 * Nuget package.
+* Events.
 
 ### Long-term features
 These will mostly correspond to the parts of WsFederation that were not mentioned above.
