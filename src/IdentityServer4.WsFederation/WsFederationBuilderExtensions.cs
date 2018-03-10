@@ -1,5 +1,4 @@
-﻿using IdentityServer4.Services;
-using IdentityServer4.WsFederation.Validation;
+﻿using IdentityServer4.WsFederation.Validation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace IdentityServer4.WsFederation
@@ -9,7 +8,6 @@ namespace IdentityServer4.WsFederation
         public static IIdentityServerBuilder AddWsFederation(this IIdentityServerBuilder builder)
         {
             builder.Services.AddTransient<WsFederationMetadataGenerator>();
-            builder.Services.AddTransient<IReturnUrlParser, WsFederationReturnUrlParser>();
             builder.Services.AddTransient<IWsFederationRequestValidator, WsFederationRequestValidator>();
             builder.Services.AddTransient<IWsFederationResponseGenerator, WsFederationSigninResponseGenerator>();
 

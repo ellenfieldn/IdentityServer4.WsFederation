@@ -1,12 +1,10 @@
 ﻿using IdentityServer4.Configuration;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols.WsFederation;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.IdentityModel.Xml;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -15,11 +13,13 @@ namespace IdentityServer4.WsFederation
 {
     public class WsFederationMetadataGenerator
     {
+        private readonly ILogger _logger;
         private readonly IdentityServerOptions _options;
         private readonly IKeyMaterialService _keys;
 
-        public WsFederationMetadataGenerator(IdentityServerOptions options, IKeyMaterialService keys)
+        public WsFederationMetadataGenerator(ILogger<WsFederationMetadataGenerator> logger, IdentityServerOptions options, IKeyMaterialService keys)
         {
+            _logger = logger;
             _options = options;
             _keys = keys;
         }
@@ -43,6 +43,7 @@ namespace IdentityServer4.WsFederation
             //For now, this is a workaround.
             if (configuration.SigningCredentials.Digest == null)
             {
+                _logger.LogInformation($"SigningCredentials does not have a digest specified. Using default digest algorithm of {SecurityAlgorithms.Sha256Digest}");
                 configuration.SigningCredentials = new SigningCredentials(configuration.SigningCredentials.Key, configuration.SigningCredentials.Algorithm, SecurityAlgorithms.Sha256Digest);
             }
             configuration.KeyInfos.Add(new KeyInfo(configuration.SigningCredentials.Key));

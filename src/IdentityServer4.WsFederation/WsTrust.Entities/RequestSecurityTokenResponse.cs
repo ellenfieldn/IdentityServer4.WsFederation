@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 using Microsoft.IdentityModel.Tokens;
 
 namespace IdentityServer4.WsFederation.WsTrust.Entities
