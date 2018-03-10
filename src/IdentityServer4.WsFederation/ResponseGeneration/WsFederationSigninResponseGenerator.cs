@@ -3,25 +3,25 @@ using IdentityServer4.Services;
 using IdentityServer4.WsFederation.Validation;
 using IdentityServer4.WsFederation.WsTrust.Entities;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols.WsFederation;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.IdentityModel.Tokens.Saml2;
-using System;
-using System.Collections.Generic;
 using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace IdentityServer4.WsFederation
 {
     public class WsFederationSigninResponseGenerator : IWsFederationResponseGenerator
     {
+        private readonly ILogger _logger;
         private readonly ISystemClock _clock;
         private readonly IdentityServerOptions _options;
         private readonly IKeyMaterialService _keys;
         
-        public WsFederationSigninResponseGenerator(ISystemClock clock, IdentityServerOptions options, IKeyMaterialService keys)
+        public WsFederationSigninResponseGenerator(ILogger<WsFederationSigninResponseGenerator> logger, ISystemClock clock, IdentityServerOptions options, IKeyMaterialService keys)
         {
+            _logger = logger;
             _clock = clock;
             _options = options;
             _keys = keys;
@@ -29,6 +29,7 @@ namespace IdentityServer4.WsFederation
 
         public async Task<WsFederationSigninResponse> GenerateResponseAsync(ValidatedWsFederationRequest request)
         {
+            _logger.LogDebug("Creating WsFederation Signin Response.");
             var responseMessage = new WsFederationMessage
             {
                 IssuerAddress = request.RequestMessage.Wreply,
@@ -69,12 +70,15 @@ namespace IdentityServer4.WsFederation
             //For now, this is a workaround.
             if (tokenDescriptor.SigningCredentials.Digest == null)
             {
+                _logger.LogInformation($"SigningCredentials does not have a digest specified. Using default digest algorithm of {SecurityAlgorithms.Sha256Digest}");
                 tokenDescriptor.SigningCredentials = new SigningCredentials(tokenDescriptor.SigningCredentials.Key, tokenDescriptor.SigningCredentials.Algorithm, SecurityAlgorithms.Sha256Digest);
             }
 
+            _logger.LogDebug("Creating SAML 2.0 security token.");
             var tokenHandler = new Saml2SecurityTokenHandler();
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
+            _logger.LogDebug("Serializing RSTR.");
             var rstr = new RequestSecurityTokenResponse
             {
                 AppliesTo = new AppliesTo(request.RequestMessage.Wtrealm),

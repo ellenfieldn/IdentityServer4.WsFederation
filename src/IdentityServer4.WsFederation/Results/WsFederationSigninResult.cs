@@ -6,9 +6,6 @@ using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace IdentityServer4.WsFederation
@@ -29,10 +26,10 @@ namespace IdentityServer4.WsFederation
 
         public async Task ExecuteAsync(HttpContext context)
         {
-            _options = context.RequestServices.GetRequiredService<IdentityServerOptions>();
-            _clock = context.RequestServices.GetRequiredService<ISystemClock>();
-            _errorMessageStore = context.RequestServices.GetRequiredService<IMessageStore<ErrorMessage>>();
-            _userSession = context.RequestServices.GetRequiredService<IUserSession>();
+            _options = _options ?? context.RequestServices.GetRequiredService<IdentityServerOptions>();
+            _clock = _clock ?? context.RequestServices.GetRequiredService<ISystemClock>();
+            _errorMessageStore = _errorMessageStore ?? context.RequestServices.GetRequiredService<IMessageStore<ErrorMessage>>();
+            _userSession = _userSession ?? context.RequestServices.GetRequiredService<IUserSession>();
 
             if (Response.IsError)
             {
@@ -50,25 +47,14 @@ namespace IdentityServer4.WsFederation
             {
                 await _userSession.AddClientIdAsync(Response.Request.Client.ClientId);
             }
-
-            var responseHtml = string.Format(formPostHtml, Response.ResponseMessage.IssuerAddress, Response.ResponseMessage.Wresult, Response.ResponseMessage.Wctx);
             var formPost = Response.ResponseMessage.BuildFormPost();
             context.Response.ContentType = "text/html";
             await context.Response.WriteHtmlAsync(formPost);
         }
 
-        private const string formPostHtml = "<form method='post' action='{0}'><input name='wresult' type='hidden' value='{1}' /><input name='wctx' type='hidden' value='{2}' /><noscript><button>Click to continue</button></noscript></form><script>(function(){{document.forms[0].submit();}})();</script>";
-
         private async Task ProcessErrorAsync(HttpContext context)
         {
-            if(Response.Error == "Invalid wreply")
-            {
-                await RedirectToErrorPageAsync(context);
-            }
-            else
-            {
-                await ProcessResponseAsync(context);
-            }
+            await RedirectToErrorPageAsync(context);
         }
 
         private async Task RedirectToErrorPageAsync(HttpContext context)
@@ -84,9 +70,8 @@ namespace IdentityServer4.WsFederation
             var id = await _errorMessageStore.WriteAsync(message);
 
             var errorUrl = _options.UserInteraction.ErrorUrl;
-
-            //TODO: Double check this string concatenation
-            var url = errorUrl + _options.UserInteraction.ErrorIdParameter + id;
+            var url = $"{errorUrl}?{_options.UserInteraction.ErrorIdParameter}={id}";
+            context.Response.RedirectToAbsoluteUrl(url);
         }
     }
 }
