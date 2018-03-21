@@ -1,7 +1,7 @@
-﻿using IdentityServer4.WsFederation.Validation;
-using Microsoft.Extensions.DependencyInjection;
+﻿using IdentityServer4.WsFederation;
+using IdentityServer4.WsFederation.Validation;
 
-namespace IdentityServer4.WsFederation
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class WsFederationBuilderExtensions
     {
