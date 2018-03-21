@@ -8,30 +8,29 @@ namespace IdentityServer4.WsFederation.Tests
     public class RstrSerializerTests
     {
         [TestMethod]
-        public void SerializeTest()
+        public void SerializeBaseRstrAttributes()
         {
             var rstr = RequestSecurityTokenResponseSerializer.Deserialize(WResult_Saml2_Valid);
             var rstrString = RequestSecurityTokenResponseSerializer.Serialize(rstr);
             StringAssert.Contains(rstrString, "RequestSecurityTokenResponse");
+            StringAssert.Contains(rstrString, "Lifetime");
+            StringAssert.Contains(rstrString, "AppliesTo");
+            StringAssert.Contains(rstrString, "TokenType");
+            StringAssert.Contains(rstrString, "RequestType");
+            StringAssert.Contains(rstrString, "KeyType");
+        }
+
+        [TestMethod]
+        public void SerializeRequestedSecurityToken()
+        {
+            var rstr = RequestSecurityTokenResponseSerializer.Deserialize(WResult_Saml2_Valid);
+            var rstrString = RequestSecurityTokenResponseSerializer.Serialize(rstr);
             StringAssert.Contains(rstrString, "RequestedSecurityToken");
             StringAssert.Contains(rstrString, "Assertion");
         }
 
         [TestMethod]
-        public void SignatureTest()
-        {
-
-        }
-
-        /*protected virtual Saml2SecurityToken ValidateSignature(string token, TokenValidationParameters validationParameters)
-        {
-            var validatedSamlToken = validationParameters.SignatureValidator(token, validationParameters);
-            var validatedSaml = validatedSamlToken as Saml2SecurityToken;
-            return validatedSaml;
-        }*/
-
-        [TestMethod]
-        public void DeserializeTest()
+        public void DeserializeBaseRstrAttributes()
         {
             var rstr = RequestSecurityTokenResponseSerializer.Deserialize(WResult_Saml2_Valid);
             Assert.IsNotNull(rstr);
@@ -48,8 +47,14 @@ namespace IdentityServer4.WsFederation.Tests
             Assert.AreEqual("http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0", rstr.TokenType);
             Assert.AreEqual("http://schemas.xmlsoap.org/ws/2005/02/trust/Issue", rstr.RequestType);
             Assert.AreEqual("http://schemas.xmlsoap.org/ws/2005/05/identity/NoProofKey", rstr.KeyType);
+        }
 
-            //TODO: Add the checks for the token deserialization
+        [TestMethod]
+        public void DeserializeSaml2Token()
+        {
+            var rstr = RequestSecurityTokenResponseSerializer.Deserialize(WResult_Saml2_Valid);
+            Assert.IsNotNull(rstr);
+
             Assert.IsNotNull(rstr.RequestedSecurityToken);
             Assert.AreEqual("https://sts.windows.net/add29489-7269-41f4-8841-b63c95564420/", rstr.RequestedSecurityToken.Issuer);
 

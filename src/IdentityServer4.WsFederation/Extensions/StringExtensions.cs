@@ -2,7 +2,7 @@
 
 namespace IdentityServer4.WsFederation.Extensions
 {
-    static internal class StringExtensions
+    static public class StringExtensions
     {
         public static string AddQueryString(this string url, string query)
         {
