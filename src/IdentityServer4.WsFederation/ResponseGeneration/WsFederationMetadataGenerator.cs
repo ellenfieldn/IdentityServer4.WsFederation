@@ -1,4 +1,5 @@
 ﻿using IdentityServer4.Configuration;
+using IdentityServer4.Extensions;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -30,7 +31,7 @@ namespace IdentityServer4.WsFederation
             {
                 Issuer = _options.IssuerUri,
                 SigningCredentials = await _keys.GetSigningCredentialsAsync(),
-                TokenEndpoint = context.Items["idsvr:IdentityServerOrigin"] + "/wsfederation/signin"
+                TokenEndpoint = context.GetIdentityServerOrigin() + "/wsfederation/signin"
             };
             //For whatever reason, the Digest method isn't specified in the builder extensions for identity server.
             //Not a good solution to force the user to use th eoverload that takes SigningCredentials
