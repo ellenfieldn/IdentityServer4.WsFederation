@@ -12,7 +12,7 @@ namespace IdentityServer4.WsFederation.Server.Config
             {
                 ClientId = "urn:idsrv4:wsfed:sample",
                 ProtocolType = ProtocolTypes.WsFederation,
-                RedirectUris = { "http://localhost:63307/signin-wsfed" },
+                RedirectUris = { "http://localhost:51213/signin-wsfed" },
             }
         };
     }
