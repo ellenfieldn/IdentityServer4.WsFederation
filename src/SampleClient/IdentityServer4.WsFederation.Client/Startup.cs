@@ -28,11 +28,11 @@ namespace IdentityServer4.WsFederation.Client
             .AddWsFederation(options =>
             {
                 options.Wtrealm = "urn:idsrv4:wsfed:sample";
-                options.MetadataAddress = "http://localhost:63338/wsfederation/metadata";
+                options.MetadataAddress = "http://localhost:51215/wsfederation/metadata";
                 //options.Wtrealm = "urn:aspnetcorerp";
                 //options.MetadataAddress = "http://localhost:5000/wsfederation";
                 options.RequireHttpsMetadata = false;
-                options.Wreply = "http://localhost:63307/signin-wsfed";
+                options.Wreply = "http://localhost:51213/signin-wsfed";
             })
             .AddCookie();
         }
