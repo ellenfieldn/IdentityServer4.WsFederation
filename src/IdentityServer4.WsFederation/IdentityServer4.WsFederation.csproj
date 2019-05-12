@@ -2,6 +2,19 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <Description>Full .Net Core implementation of WsFederation for IdentityServer4 and asp.net core.</Description>
+    <Authors>Nathan Ellenfield</Authors>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Copyright>© Nathan Ellenfield. All rights reserved.</Copyright>
+    <PackageLicenseUrl>https://github.com/ellenfieldn/IdentityServer4.WsFederation/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/ellenfieldn/IdentityServer4.WsFederation</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ellenfieldn/IdentityServer4.WsFederation</RepositoryUrl>
+    <PackageReleaseNotes>Initial Alpha Release - Support for signin workflow</PackageReleaseNotes>
+    <PackageTags>IdentityServer IdentityServer4 WsFederation Ws-Federation Identity Security Authentication Federation</PackageTags>
+    <Version>0.1.0</Version>
+    <PackageId>IdentityServer4.Contrib.WsFederation</PackageId>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    <FileVersion>0.1.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
