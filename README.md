@@ -1,19 +1,16 @@
 # IdentityServer4.WsFederation
-Full .Net Core implementation of WsFederation for IdentityServer4 and asp.net core. 
+Plugin for IdentityServer4 that enables IdentityServer to function as a Ws-Federation Identity Provider.
 
-[![Build Status](https://ellenfieldn.visualstudio.com/_apis/public/build/definitions/6f83beb3-3c49-47b7-966c-8b7539f8c204/1/badge)](https://ellenfieldn.visualstudio.com/IdentityServer4.WsFederation/_build/index?&definitionId=1)
+[![Build status](https://ellenfieldn.visualstudio.com/IdentityServer4.WsFederation/_apis/build/status/IdentityServer4.WsFederation-CI)](https://ellenfieldn.visualstudio.com/IdentityServer4.WsFederation/_build/latest?definitionId=2)
 
-I built this because:
-* Everything else i saw was targeted at .Net Framework
-* I wanted to be able to use WsFederation while targeting .net core.
-* I want it to be possible to deploy linux containers with a WsFederation Identity Provider.
 
 ## Getting Started
-If you want to get started, see the Samples folders for a working server and client. Long-term, the easiest way to get started will be to clone the IdentityServer4.Quickstart project of your choice and then to add a nuget with a reference to the IdentityServer4.WsFederation plugin.
+The easiest way to get started is to:
+1. Clone the IdentityServer4.Quickstart project of your choice (unless you plan to build the UI from scratch)
+1. Install the `IdentityServer4.Contrib.WsFederation` package.
+1. Configure Startup.cs as below
 
-For now, it's probably easiest to just clone my this repo and either:
-1. Modify the Sample server project to fit your needs
-2. Create a new project, clone an IdentityServer4.Quickstart project, use the Startup.cs file in the Sample Server project.
+Also, see the Samples folders for a working server (src/SampleServer) and client (src/SampleClient).
 
 ### The code
 Do the following in `Startup.cs` to use this plugin with Asp.net Core.
@@ -47,7 +44,7 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 
 
 ## Supported Functionality
-Right now, this is basically in the POC state and is my first pass at getting a working IdentityServer4 plugin to support WsFederation for passive authentication.
+Right now, this library is in alpha. Consequently, only a subset of the WsFederation standard is supported. It's also likely that some features of IdentityServer aren't well integrated yet.
 
 ### Supported Workflows
 * Signin
@@ -57,6 +54,7 @@ Right now, this is basically in the POC state and is my first pass at getting a 
 * wa
 * wreply
 * wctx
+* wfresh
 
 ### Supported Outputs
 * wa
@@ -66,17 +64,11 @@ Right now, this is basically in the POC state and is my first pass at getting a 
 ## Something Vaguely Resembling a Roadmap
 I plan to do this stuff. 
 
-### Top Priority Things
-These are the things that I'm planning on doing pretty soon.
-* Need to make cookies configurable.
-* Need to figure out how I want to handle the awkwardness with the SigningCredentials. Short run, I can probably get a better solution. Long run, I think IdentityServer4 should probably make some small changes to their extensions. Need to understand better before I file an issue and potentially offer to "fix" it.
-
-### Other things that are on the roadmap
+### Near-term features
 These things are pretty much goals for the mid-term.
 * Supporting the basic signout workflow.
-* Supporting the rest of the easy parameters.
+* Supporting the rest of the request parameters
 * Better input validation.
-* Nuget package.
 * Events.
 
 ### Long-term features
