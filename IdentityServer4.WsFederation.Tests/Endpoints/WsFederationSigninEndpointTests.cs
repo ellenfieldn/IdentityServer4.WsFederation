@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols.WsFederation;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
+using System;
 using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -16,6 +17,7 @@ namespace IdentityServer4.WsFederation.Tests.Endpoints
     [TestClass]
     public class WsFederationSigninEndpointTests
     {
+        private ClaimsPrincipal _defaultUserPrincipal;
         private ILogger<WsFederationSigninEndpoint> _logger = Substitute.For<ILogger<WsFederationSigninEndpoint>>();
         private IdentityServerOptions _options = new IdentityServerOptions();
         private ValidatedWsFederationRequest _validatedRequest;
@@ -31,6 +33,11 @@ namespace IdentityServer4.WsFederation.Tests.Endpoints
             _validatedRequest = Substitute.For<ValidatedWsFederationRequest>();
             _validator = Substitute.For<IWsFederationRequestValidator>();
             _validator.ValidateAsync(default, default).ReturnsForAnyArgs(new WsFederationRequestValidationResult(_validatedRequest));
+
+            var defaultAuthTime = DateTimeOffset.UtcNow - TimeSpan.FromSeconds(500);
+            var defaultIdentity = new ClaimsIdentity();
+            defaultIdentity.AddClaim(new Claim("auth_time", defaultAuthTime.ToUnixTimeSeconds().ToString()));
+            _defaultUserPrincipal = new ClaimsPrincipal(defaultIdentity);
         }
 
         [TestMethod]
@@ -104,6 +111,64 @@ namespace IdentityServer4.WsFederation.Tests.Endpoints
             var endpoint = new WsFederationSigninEndpoint(_logger, _options, _validator, _responseGenerator, _userSession);
             var httpContext = new DefaultHttpContext();
             httpContext.Request.Method = HttpMethods.Get;
+
+            var result = await endpoint.ProcessAsync(httpContext) as WsFederationSigninResult;
+            Assert.IsNotNull(result);
+            Assert.AreEqual(signinResponse, result.Response);
+        }
+
+        [TestMethod]
+        public async Task WhenWfreshIs0_LoginResultIsReturned()
+        {
+            _userSession.GetUserAsync().ReturnsForAnyArgs(Task.FromResult(_defaultUserPrincipal as ClaimsPrincipal));
+            _validatedRequest.RequestMessage = new WsFederationMessage();
+            _options.UserInteraction = new UserInteractionOptions();
+            _options.UserInteraction.LoginUrl = "http://Login/Url";
+            _options.UserInteraction.LoginReturnUrlParameter = "testParam";
+            var endpoint = new WsFederationSigninEndpoint(_logger, _options, _validator, _responseGenerator, _userSession);
+            var httpContext = Substitute.For<HttpContext>();
+            httpContext.Request.Method = HttpMethods.Get;
+            httpContext.Request.QueryString = new QueryString("?wfresh=0");
+            httpContext.RequestServices.GetService(typeof(IdentityServerOptions)).Returns(_options);
+
+            var result = await endpoint.ProcessAsync(httpContext) as WsFederationLoginPageResult;
+            Assert.IsNotNull(result);
+            await result.ExecuteAsync(httpContext);
+
+            httpContext.Response.Received().RedirectToAbsoluteUrl("http://Login/Url?testParam=%2Fwsfederation%2Fsignin");
+        }
+
+        [TestMethod]
+        public async Task WhenWfreshIsShorterThanAuthInterval_LoginResultIsReturned()
+        {
+            _userSession.GetUserAsync().ReturnsForAnyArgs(Task.FromResult(_defaultUserPrincipal as ClaimsPrincipal));
+            _validatedRequest.RequestMessage = new WsFederationMessage();
+            _options.UserInteraction = new UserInteractionOptions();
+            _options.UserInteraction.LoginUrl = "http://Login/Url";
+            _options.UserInteraction.LoginReturnUrlParameter = "testParam";
+            var endpoint = new WsFederationSigninEndpoint(_logger, _options, _validator, _responseGenerator, _userSession);
+            var httpContext = Substitute.For<HttpContext>();
+            httpContext.Request.Method = HttpMethods.Get;
+            httpContext.Request.QueryString = new QueryString("?wfresh=1");
+            httpContext.RequestServices.GetService(typeof(IdentityServerOptions)).Returns(_options);
+
+            var result = await endpoint.ProcessAsync(httpContext) as WsFederationLoginPageResult;
+            Assert.IsNotNull(result);
+            await result.ExecuteAsync(httpContext);
+
+            httpContext.Response.Received().RedirectToAbsoluteUrl("http://Login/Url?testParam=%2Fwsfederation%2Fsignin");
+        }
+
+        [TestMethod]
+        public async Task WhenWfreshIsLongerThanAuthInterval_SigninResultIsReturned()
+        {
+            _userSession.GetUserAsync().ReturnsForAnyArgs(Task.FromResult(_defaultUserPrincipal as ClaimsPrincipal));
+            var signinResponse = new WsFederationSigninResponse();
+            _responseGenerator.GenerateResponseAsync(_validatedRequest).Returns(signinResponse);
+            var endpoint = new WsFederationSigninEndpoint(_logger, _options, _validator, _responseGenerator, _userSession);
+            var httpContext = new DefaultHttpContext();
+            httpContext.Request.Method = HttpMethods.Get;
+            httpContext.Request.QueryString = new QueryString("?wfresh=1000");
 
             var result = await endpoint.ProcessAsync(httpContext) as WsFederationSigninResult;
             Assert.IsNotNull(result);
