@@ -1,12 +1,15 @@
 ﻿using IdentityServer4.Configuration;
 using IdentityServer4.Endpoints.Results;
+using IdentityServer4.Extensions;
 using IdentityServer4.Hosting;
 using IdentityServer4.Services;
 using IdentityServer4.WsFederation.Validation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols.WsFederation;
+using System;
 using System.Net;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace IdentityServer4.WsFederation
@@ -57,9 +60,8 @@ namespace IdentityServer4.WsFederation
             }
 
             //if needed, show login page
-            if(user == null)
+            if(IsLoginRequired(user, message))
             {
-                _logger.LogInformation("User is null. Showing login page.");
                 return new WsFederationLoginPageResult(validationResult.ValidatedRequest);
             }
 
@@ -68,6 +70,27 @@ namespace IdentityServer4.WsFederation
 
             _logger.LogTrace("End get WsFederation signin request.");
             return new WsFederationSigninResult(response);
+        }
+
+        private bool IsLoginRequired(ClaimsPrincipal user, WsFederationMessage message)
+        {
+            if(user == null)
+            {
+                _logger.LogInformation("User is null. Showing login page.");
+                return true;
+            }
+
+            //If the request contains a wfresh parameter, determine if the session is fresh enough to satisfy the wfresh
+            if (long.TryParse(message.Wfresh, out long wfresh))
+            {
+                var authAge = DateTime.UtcNow - user.GetAuthenticationTime();
+                if (authAge.TotalSeconds >= wfresh)
+                {
+                    _logger.LogInformation("User session does not meet freshness requirement. Forcing re-authentication.");
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
