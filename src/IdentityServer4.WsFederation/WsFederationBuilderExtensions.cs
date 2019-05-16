@@ -12,7 +12,7 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.Services.AddTransient<IWsFederationResponseGenerator, WsFederationSigninResponseGenerator>();
 
             builder.AddEndpoint<WsFederationMetadataEndpoint>("Metadata", "/wsfederation/metadata");
-            builder.AddEndpoint<WsFederationSigninEndpoint>("Signin", "/wsfederation/signin");
+            builder.AddEndpoint<WsFederationEndpoint>("Signin", "/wsfederation");
             return builder;
         }
     }

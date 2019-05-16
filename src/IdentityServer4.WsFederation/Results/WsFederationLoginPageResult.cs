@@ -23,7 +23,7 @@ namespace IdentityServer4.WsFederation
         {
             _options = _options ?? context.RequestServices.GetRequiredService<IdentityServerOptions>();
 
-            var returnUrl = context.GetIdentityServerBasePath() + "/wsfederation/signin"; //TODO: This probably shouldn't be a hard-coded string.
+            var returnUrl = context.GetIdentityServerBasePath() + "/wsfederation"; //TODO: This probably shouldn't be a hard-coded string.
             returnUrl = returnUrl + _request.RequestMessage.BuildRedirectUrl();
 
             var loginUrl = _options.UserInteraction.LoginUrl;

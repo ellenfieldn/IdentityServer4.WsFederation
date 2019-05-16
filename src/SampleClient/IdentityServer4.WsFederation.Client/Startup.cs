@@ -32,7 +32,8 @@ namespace IdentityServer4.WsFederation.Client
                 //options.Wtrealm = "urn:aspnetcorerp";
                 //options.MetadataAddress = "http://localhost:5000/wsfederation";
                 options.RequireHttpsMetadata = false;
-                options.Wreply = "http://localhost:51213/signin-wsfed";
+                options.Wreply = "http://localhost:51214/signin-wsfed";
+                options.SignOutWreply = "http://localhost:51214/";
             })
             .AddCookie();
         }

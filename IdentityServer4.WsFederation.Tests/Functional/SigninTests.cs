@@ -21,7 +21,7 @@ namespace IdentityServer4.WsFederation.Tests.Functional
         [TestMethod]
         public async Task SigninWithNoContextRedirectsToLogin()
         {
-            var response = await _client.GetAsync("/wsfederation/signin?wa=wsignin1.0&wtrealm=urn:idsrv4:wsfed:sample");
+            var response = await _client.GetAsync("/wsfederation?wa=wsignin1.0&wtrealm=urn:idsrv4:wsfed:sample");
             var content = await response.Content.ReadAsStringAsync();
 
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
