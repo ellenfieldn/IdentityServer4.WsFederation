@@ -20,8 +20,9 @@ namespace IdentityServer4.WsFederation.Tests.Endpoints
         private ClaimsPrincipal _defaultUserPrincipal;
         private ILogger<WsFederationEndpoint> _logger = Substitute.For<ILogger<WsFederationEndpoint>>();
         private IdentityServerOptions _options = new IdentityServerOptions();
-        private ValidatedWsFederationRequest _validatedRequest;
-        private IWsFederationRequestValidator _validator;
+        private ValidatedWsFederationSigninRequest _validatedRequest;
+        private IWsFederationSigninValidator _signinValidator;
+        private IWsFederationSignoutValidator _signoutValidator;
         private IWsFederationResponseGenerator _responseGenerator;
         private IUserSession _userSession;
 
@@ -30,9 +31,9 @@ namespace IdentityServer4.WsFederation.Tests.Endpoints
         {
             _responseGenerator = Substitute.For<IWsFederationResponseGenerator>();
             _userSession = Substitute.For<IUserSession>();
-            _validatedRequest = Substitute.For<ValidatedWsFederationRequest>();
-            _validator = Substitute.For<IWsFederationRequestValidator>();
-            _validator.ValidateAsync(default, default).ReturnsForAnyArgs(new WsFederationRequestValidationResult(_validatedRequest));
+            _validatedRequest = Substitute.For<ValidatedWsFederationSigninRequest>();
+            _signinValidator = Substitute.For<IWsFederationSigninValidator>();
+            _signinValidator.ValidateAsync(default, default).ReturnsForAnyArgs(new WsFederationSigninValidationResult(_validatedRequest));
 
             var defaultAuthTime = DateTimeOffset.UtcNow - TimeSpan.FromSeconds(500);
             var defaultIdentity = new ClaimsIdentity();
@@ -43,7 +44,7 @@ namespace IdentityServer4.WsFederation.Tests.Endpoints
         [TestMethod]
         public async Task PostShouldReturnInvalidMethod()
         {
-            var endpoint = new WsFederationEndpoint(_logger, _options, _validator, _responseGenerator, _userSession);
+            var endpoint = new WsFederationEndpoint(_logger, _options, _signinValidator, _signoutValidator, _responseGenerator, _userSession);
             var httpContext = new DefaultHttpContext();
             httpContext.Request.Method = HttpMethods.Post;
 
@@ -55,8 +56,8 @@ namespace IdentityServer4.WsFederation.Tests.Endpoints
         [TestMethod]
         public async Task FailedValidationReturnsErrorResult()
         {
-            _validator.ValidateAsync(default, default).ReturnsForAnyArgs(new WsFederationRequestValidationResult(_validatedRequest, "Mock Error", "This is a mock error."));
-            var endpoint = new WsFederationEndpoint(_logger, _options, _validator, _responseGenerator, _userSession);
+            _signinValidator.ValidateAsync(default, default).ReturnsForAnyArgs(new WsFederationSigninValidationResult(_validatedRequest, "Mock Error", "This is a mock error."));
+            var endpoint = new WsFederationEndpoint(_logger, _options, _signinValidator, _signoutValidator, _responseGenerator, _userSession);
             var httpContext = new DefaultHttpContext();
             httpContext.Request.Method = HttpMethods.Get;
 
@@ -75,7 +76,7 @@ namespace IdentityServer4.WsFederation.Tests.Endpoints
             _options.UserInteraction = new UserInteractionOptions();
             _options.UserInteraction.LoginUrl = "http://Login/Url";
             _options.UserInteraction.LoginReturnUrlParameter = "testParam";
-            var endpoint = new WsFederationEndpoint(_logger, _options, _validator, _responseGenerator, _userSession);
+            var endpoint = new WsFederationEndpoint(_logger, _options, _signinValidator, _signoutValidator, _responseGenerator, _userSession);
             var httpContext = Substitute.For<HttpContext>();
             httpContext.Request.Method = HttpMethods.Get;
             httpContext.RequestServices.GetService(typeof(IdentityServerOptions)).Returns(_options);
@@ -93,7 +94,7 @@ namespace IdentityServer4.WsFederation.Tests.Endpoints
         {
             var signinResponse = new WsFederationSigninResponse();
             _responseGenerator.GenerateResponseAsync(_validatedRequest).Returns(signinResponse);
-            var endpoint = new WsFederationEndpoint(_logger, _options, _validator, _responseGenerator, _userSession);
+            var endpoint = new WsFederationEndpoint(_logger, _options, _signinValidator, _signoutValidator, _responseGenerator, _userSession);
             var httpContext = new DefaultHttpContext();
             httpContext.Request.Method = HttpMethods.Get;
 
@@ -108,7 +109,7 @@ namespace IdentityServer4.WsFederation.Tests.Endpoints
             var signinResponse = new WsFederationSigninResponse();
             signinResponse.Error = "Really bad error.";
             _responseGenerator.GenerateResponseAsync(_validatedRequest).Returns(signinResponse);
-            var endpoint = new WsFederationEndpoint(_logger, _options, _validator, _responseGenerator, _userSession);
+            var endpoint = new WsFederationEndpoint(_logger, _options, _signinValidator, _signoutValidator, _responseGenerator, _userSession);
             var httpContext = new DefaultHttpContext();
             httpContext.Request.Method = HttpMethods.Get;
 
@@ -125,7 +126,7 @@ namespace IdentityServer4.WsFederation.Tests.Endpoints
             _options.UserInteraction = new UserInteractionOptions();
             _options.UserInteraction.LoginUrl = "http://Login/Url";
             _options.UserInteraction.LoginReturnUrlParameter = "testParam";
-            var endpoint = new WsFederationEndpoint(_logger, _options, _validator, _responseGenerator, _userSession);
+            var endpoint = new WsFederationEndpoint(_logger, _options, _signinValidator, _signoutValidator, _responseGenerator, _userSession);
             var httpContext = Substitute.For<HttpContext>();
             httpContext.Request.Method = HttpMethods.Get;
             httpContext.Request.QueryString = new QueryString("?wfresh=0");
@@ -146,7 +147,7 @@ namespace IdentityServer4.WsFederation.Tests.Endpoints
             _options.UserInteraction = new UserInteractionOptions();
             _options.UserInteraction.LoginUrl = "http://Login/Url";
             _options.UserInteraction.LoginReturnUrlParameter = "testParam";
-            var endpoint = new WsFederationEndpoint(_logger, _options, _validator, _responseGenerator, _userSession);
+            var endpoint = new WsFederationEndpoint(_logger, _options, _signinValidator, _signoutValidator, _responseGenerator, _userSession);
             var httpContext = Substitute.For<HttpContext>();
             httpContext.Request.Method = HttpMethods.Get;
             httpContext.Request.QueryString = new QueryString("?wfresh=1");
@@ -165,7 +166,7 @@ namespace IdentityServer4.WsFederation.Tests.Endpoints
             _userSession.GetUserAsync().ReturnsForAnyArgs(Task.FromResult(_defaultUserPrincipal as ClaimsPrincipal));
             var signinResponse = new WsFederationSigninResponse();
             _responseGenerator.GenerateResponseAsync(_validatedRequest).Returns(signinResponse);
-            var endpoint = new WsFederationEndpoint(_logger, _options, _validator, _responseGenerator, _userSession);
+            var endpoint = new WsFederationEndpoint(_logger, _options, _signinValidator, _signoutValidator, _responseGenerator, _userSession);
             var httpContext = new DefaultHttpContext();
             httpContext.Request.Method = HttpMethods.Get;
             httpContext.Request.QueryString = new QueryString("?wfresh=1000");

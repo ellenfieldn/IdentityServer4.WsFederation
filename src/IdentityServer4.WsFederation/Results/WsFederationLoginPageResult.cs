@@ -11,10 +11,10 @@ namespace IdentityServer4.WsFederation
 {
     public class WsFederationLoginPageResult : IEndpointResult
     {
-        private readonly ValidatedWsFederationRequest _request;
+        private readonly ValidatedWsFederationSigninRequest _request;
         private IdentityServerOptions _options;
 
-        public WsFederationLoginPageResult(ValidatedWsFederationRequest request)
+        public WsFederationLoginPageResult(ValidatedWsFederationSigninRequest request)
         {
             _request = request;
         }

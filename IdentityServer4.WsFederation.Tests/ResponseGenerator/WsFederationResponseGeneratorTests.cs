@@ -42,13 +42,13 @@ namespace IdentityServer4.WsFederation.Tests.ResponseGenerator
             return new WsFederationSigninResponseGenerator(logger, clock, options, keys);
         }
 
-        private ValidatedWsFederationRequest GetDefaultValidatedRequest()
+        private ValidatedWsFederationSigninRequest GetDefaultValidatedRequest()
         {
             var client = new Client
             {
                 IdentityTokenLifetime = 300
             };
-            var request = new ValidatedWsFederationRequest
+            var request = new ValidatedWsFederationSigninRequest
             {
                 Client = client,
                 RequestMessage = new WsFederationMessage

@@ -8,6 +8,7 @@ using IdentityServer4.WsFederation.Client.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.WsFederation;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace IdentityServer4.WsFederation.Client.Controllers
 {
@@ -27,7 +28,7 @@ namespace IdentityServer4.WsFederation.Client.Controllers
 
         public IActionResult Logout()
         {
-            return SignOut(WsFederationDefaults.AuthenticationScheme);
+            return SignOut(WsFederationDefaults.AuthenticationScheme, CookieAuthenticationDefaults.AuthenticationScheme);
         }
 
         public IActionResult Error()

@@ -5,6 +5,6 @@ namespace IdentityServer4.WsFederation
 {
     public interface IWsFederationResponseGenerator
     {
-        Task<WsFederationSigninResponse> GenerateResponseAsync(ValidatedWsFederationRequest validatedRequest);
+        Task<WsFederationSigninResponse> GenerateResponseAsync(ValidatedWsFederationSigninRequest validatedRequest);
     }
 }

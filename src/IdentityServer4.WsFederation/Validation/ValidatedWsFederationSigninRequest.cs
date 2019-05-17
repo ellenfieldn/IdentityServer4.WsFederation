@@ -3,7 +3,7 @@ using Microsoft.IdentityModel.Protocols.WsFederation;
 
 namespace IdentityServer4.WsFederation.Validation
 {
-    public class ValidatedWsFederationRequest : ValidatedRequest
+    public class ValidatedWsFederationSigninRequest : ValidatedRequest
     {
         public WsFederationMessage RequestMessage { get; set; }
     }

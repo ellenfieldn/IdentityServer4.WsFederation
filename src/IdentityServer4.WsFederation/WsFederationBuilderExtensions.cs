@@ -8,7 +8,8 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IIdentityServerBuilder AddWsFederation(this IIdentityServerBuilder builder)
         {
             builder.Services.AddTransient<WsFederationMetadataGenerator>();
-            builder.Services.AddTransient<IWsFederationRequestValidator, WsFederationRequestValidator>();
+            builder.Services.AddTransient<IWsFederationSigninValidator, WsFederationSigninValidator>();
+            builder.Services.AddTransient<IWsFederationSignoutValidator, WsFederationSignoutValidator>();
             builder.Services.AddTransient<IWsFederationResponseGenerator, WsFederationSigninResponseGenerator>();
 
             builder.AddEndpoint<WsFederationMetadataEndpoint>("Metadata", "/wsfederation/metadata");

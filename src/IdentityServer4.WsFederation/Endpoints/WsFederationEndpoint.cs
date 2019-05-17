@@ -19,15 +19,17 @@ namespace IdentityServer4.WsFederation
     {
         private readonly ILogger _logger;
         private readonly IdentityServerOptions _options;
-        private readonly IWsFederationRequestValidator _validator;
+        private readonly IWsFederationSigninValidator _signinValidator;
+        private readonly IWsFederationSignoutValidator _signoutValidator;
         private readonly IWsFederationResponseGenerator _responseGenerator;
         private readonly IUserSession _userSession;
 
-        public WsFederationEndpoint(ILogger<WsFederationEndpoint> logger, IdentityServerOptions options, IWsFederationRequestValidator validator, IWsFederationResponseGenerator responseGenerator, IUserSession userSession)
+        public WsFederationEndpoint(ILogger<WsFederationEndpoint> logger, IdentityServerOptions options, IWsFederationSigninValidator signinValidator, IWsFederationSignoutValidator signoutValidator, IWsFederationResponseGenerator responseGenerator, IUserSession userSession)
         {
             _logger = logger;
             _options = options;
-            _validator = validator;
+            _signinValidator = signinValidator;
+            _signoutValidator = signoutValidator;
             _responseGenerator = responseGenerator;
             _userSession = userSession;
         }
@@ -51,33 +53,36 @@ namespace IdentityServer4.WsFederation
 
             if (message.IsSignOutMessage)
             {
-                //var signoutValidationResult = _signoutRequestValidator.ValidateAsync(message, user);
-                return new WsFederationSignoutResult(message.Wreply, _userSession);
+                var signoutValidationResult = await _signoutValidator.ValidateAsync(message);
+                return new WsFederationSignoutResult(signoutValidationResult);
             }
-
-            var validationResult = await _validator.ValidateAsync(message, user);
-
-            if (validationResult.IsError)
+            else
             {
-                _logger.LogError("WsFederation Signin request validation failed.");
-                return new WsFederationSigninResult(new WsFederationSigninResponse {
-                    Request = validationResult.ValidatedRequest,
-                    Error = validationResult.Error,
-                    ErrorDescription = validationResult.ErrorDescription
-                });
+                var validationResult = await _signinValidator.ValidateAsync(message, user);
+
+                if (validationResult.IsError)
+                {
+                    _logger.LogError("WsFederation Signin request validation failed.");
+                    return new WsFederationSigninResult(new WsFederationSigninResponse
+                    {
+                        Request = validationResult.ValidatedRequest,
+                        Error = validationResult.Error,
+                        ErrorDescription = validationResult.ErrorDescription
+                    });
+                }
+
+                //if needed, show login page
+                if (IsLoginRequired(user, message))
+                {
+                    return new WsFederationLoginPageResult(validationResult.ValidatedRequest);
+                }
+
+                //Otherwise, return result
+                var response = await _responseGenerator.GenerateResponseAsync(validationResult.ValidatedRequest);
+
+                _logger.LogTrace("End get WsFederation signin request.");
+                return new WsFederationSigninResult(response);
             }
-
-            //if needed, show login page
-            if(IsLoginRequired(user, message))
-            {
-                return new WsFederationLoginPageResult(validationResult.ValidatedRequest);
-            }
-
-            //Otherwise, return result
-            var response = await _responseGenerator.GenerateResponseAsync(validationResult.ValidatedRequest);
-
-            _logger.LogTrace("End get WsFederation signin request.");
-            return new WsFederationSigninResult(response);
         }
 
         private bool IsLoginRequired(ClaimsPrincipal user, WsFederationMessage message)

@@ -27,7 +27,7 @@ namespace IdentityServer4.WsFederation
             _keys = keys;
         }
 
-        public async Task<WsFederationSigninResponse> GenerateResponseAsync(ValidatedWsFederationRequest request)
+        public async Task<WsFederationSigninResponse> GenerateResponseAsync(ValidatedWsFederationSigninRequest request)
         {
             _logger.LogDebug("Creating WsFederation Signin Response.");
             var responseMessage = new WsFederationMessage
@@ -46,7 +46,7 @@ namespace IdentityServer4.WsFederation
             return response;
         }
 
-        public async Task<string> GenerateSerializedRstr(ValidatedWsFederationRequest request)
+        public async Task<string> GenerateSerializedRstr(ValidatedWsFederationSigninRequest request)
         {
             var now = _clock.UtcNow.UtcDateTime;
             var tokenDescriptor = new SecurityTokenDescriptor
