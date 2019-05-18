@@ -49,6 +49,7 @@ Right now, this library is in alpha. Consequently, only a subset of the WsFedera
 ### Supported Workflows
 * Signin
 * Metadata
+* Signout
 
 ### Supported Parameters
 * wa
@@ -66,7 +67,6 @@ I plan to do this stuff.
 
 ### Near-term features
 These things are pretty much goals for the mid-term.
-* Supporting the basic signout workflow.
 * Supporting the rest of the request parameters
 * Better input validation.
 * Events.
