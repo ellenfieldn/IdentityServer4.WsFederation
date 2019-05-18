@@ -31,7 +31,7 @@ namespace IdentityServer4.WsFederation
             {
                 Issuer = _options.IssuerUri,
                 SigningCredentials = await _keys.GetSigningCredentialsAsync(),
-                TokenEndpoint = context.GetIdentityServerOrigin() + "/wsfederation/signin"
+                TokenEndpoint = context.GetIdentityServerOrigin() + "/wsfederation"
             };
             //For whatever reason, the Digest method isn't specified in the builder extensions for identity server.
             //Not a good solution to force the user to use th eoverload that takes SigningCredentials

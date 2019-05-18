@@ -15,7 +15,7 @@ namespace IdentityServer4.WsFederation.Tests
     [TestClass]
     public class WsFederationRequestValidatorTests
     {
-        private ILogger<WsFederationRequestValidator> _logger = Substitute.For<ILogger<WsFederationRequestValidator>>();
+        private ILogger<WsFederationSigninValidator> _logger = Substitute.For<ILogger<WsFederationSigninValidator>>();
         private IClientStore _clientStore = Substitute.For<IClientStore>();
 
         private WsFederationMessage GetDefaultWsFederationMessage() => new WsFederationMessage
@@ -46,7 +46,7 @@ namespace IdentityServer4.WsFederation.Tests
         {
             var message = GetDefaultWsFederationMessage();
             message.Wa = null;
-            var requestValidator = new WsFederationRequestValidator(_logger, _clientStore);
+            var requestValidator = new WsFederationSigninValidator(_logger, _clientStore);
             var response = await requestValidator.ValidateAsync(message, null);
             Assert.IsTrue(response.IsError);
             Assert.AreEqual("Missing wa", response.Error);
@@ -60,7 +60,7 @@ namespace IdentityServer4.WsFederation.Tests
         {
             var message = GetDefaultWsFederationMessage();
             message.Wtrealm = null;
-            var requestValidator = new WsFederationRequestValidator(_logger, _clientStore);
+            var requestValidator = new WsFederationSigninValidator(_logger, _clientStore);
             var response = await requestValidator.ValidateAsync(message, null);
             Assert.IsTrue(response.IsError);
             Assert.AreEqual("Missing Wtrealm.", response.Error);
@@ -74,7 +74,7 @@ namespace IdentityServer4.WsFederation.Tests
         {
             var message = GetDefaultWsFederationMessage();
             message.Wreply = null;
-            var requestValidator = new WsFederationRequestValidator(_logger, _clientStore);
+            var requestValidator = new WsFederationSigninValidator(_logger, _clientStore);
             var response = await requestValidator.ValidateAsync(message, null);
             Assert.IsFalse(response.IsError);
             Assert.IsNull(response.Error);
@@ -89,7 +89,7 @@ namespace IdentityServer4.WsFederation.Tests
         {
             var message = GetDefaultWsFederationMessage();
             message.Wtrealm = "http://notARealClient";
-            var requestValidator = new WsFederationRequestValidator(_logger, _clientStore);
+            var requestValidator = new WsFederationSigninValidator(_logger, _clientStore);
             var response = await requestValidator.ValidateAsync(message, null);
             Assert.IsTrue(response.IsError);
             Assert.AreEqual("No Client.", response.Error);
@@ -103,7 +103,7 @@ namespace IdentityServer4.WsFederation.Tests
         {
             var message = GetDefaultWsFederationMessage();
             message.Wreply = "http://notARealWreply";
-            var requestValidator = new WsFederationRequestValidator(_logger, _clientStore);
+            var requestValidator = new WsFederationSigninValidator(_logger, _clientStore);
             var response = await requestValidator.ValidateAsync(message, null);
             Assert.IsTrue(response.IsError);
             Assert.AreEqual("Invalid redirect uri.", response.Error);
@@ -117,7 +117,7 @@ namespace IdentityServer4.WsFederation.Tests
         {
             var message = GetDefaultWsFederationMessage();
             message.Wtrealm = "http://noWsFedSupport";
-            var requestValidator = new WsFederationRequestValidator(_logger, _clientStore);
+            var requestValidator = new WsFederationSigninValidator(_logger, _clientStore);
             var response = await requestValidator.ValidateAsync(message, null);
             Assert.IsTrue(response.IsError);
             Assert.AreEqual("Invalid protocol.", response.Error);
@@ -131,25 +131,11 @@ namespace IdentityServer4.WsFederation.Tests
         {
             var message = GetDefaultWsFederationMessage();
             message.Wa = "wtf";
-            var requestValidator = new WsFederationRequestValidator(_logger, _clientStore);
+            var requestValidator = new WsFederationSigninValidator(_logger, _clientStore);
             var response = await requestValidator.ValidateAsync(message, null);
             Assert.IsTrue(response.IsError);
             Assert.AreEqual("Unsupported action.", response.Error);
-            Assert.AreEqual($"Only {WsFederationConstants.WsFederationActions.SignIn} is supported at this time.", response.ErrorDescription);
-            Assert.AreEqual(message, response.ValidatedRequest.RequestMessage);
-            Assert.IsNull(response.ValidatedRequest.Subject);
-        }
-
-        [TestMethod]
-        public async Task WaSignout_ReturnsError()
-        {
-            var message = GetDefaultWsFederationMessage();
-            message.Wa = WsFederationConstants.WsFederationActions.SignOut;
-            var requestValidator = new WsFederationRequestValidator(_logger, _clientStore);
-            var response = await requestValidator.ValidateAsync(message, null);
-            Assert.IsTrue(response.IsError);
-            Assert.AreEqual("Unsupported action.", response.Error);
-            Assert.AreEqual($"Only {WsFederationConstants.WsFederationActions.SignIn} is supported at this time.", response.ErrorDescription);
+            Assert.AreEqual("wa=wtf is not supported.", response.ErrorDescription);
             Assert.AreEqual(message, response.ValidatedRequest.RequestMessage);
             Assert.IsNull(response.ValidatedRequest.Subject);
         }
@@ -158,7 +144,7 @@ namespace IdentityServer4.WsFederation.Tests
         public async Task WaSignin_ReturnsSuccess()
         {
             var message = GetDefaultWsFederationMessage();
-            var requestValidator = new WsFederationRequestValidator(_logger, _clientStore);
+            var requestValidator = new WsFederationSigninValidator(_logger, _clientStore);
             var response = await requestValidator.ValidateAsync(message, null);
             Assert.IsFalse(response.IsError);
             Assert.IsNull(response.Error);

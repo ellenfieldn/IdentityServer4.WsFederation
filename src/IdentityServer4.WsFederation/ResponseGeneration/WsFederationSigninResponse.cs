@@ -5,7 +5,7 @@ namespace IdentityServer4.WsFederation
 {
     public class WsFederationSigninResponse
     {
-        public ValidatedWsFederationRequest Request { get; set; }
+        public ValidatedWsFederationSigninRequest Request { get; set; }
         public WsFederationMessage ResponseMessage { get; set; }
 
         public string Error { get; set; }

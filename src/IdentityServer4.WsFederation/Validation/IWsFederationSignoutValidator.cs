@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 
 namespace IdentityServer4.WsFederation.Validation
 {
-    public interface IWsFederationRequestValidator
+    public interface IWsFederationSignoutValidator
     {
-        Task<WsFederationRequestValidationResult> ValidateAsync(WsFederationMessage message, ClaimsPrincipal user);
+        Task<WsFederationSignoutValidationResult> ValidateAsync(WsFederationMessage message);
     }
 }

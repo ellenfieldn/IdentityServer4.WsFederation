@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using IdentityServer4.WsFederation.Client.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.WsFederation;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace IdentityServer4.WsFederation.Client.Controllers
 {
@@ -23,11 +26,9 @@ namespace IdentityServer4.WsFederation.Client.Controllers
             return View();
         }
 
-        public IActionResult Contact()
+        public IActionResult Logout()
         {
-            ViewData["Message"] = "Your contact page.";
-
-            return View();
+            return SignOut(WsFederationDefaults.AuthenticationScheme, CookieAuthenticationDefaults.AuthenticationScheme);
         }
 
         public IActionResult Error()
