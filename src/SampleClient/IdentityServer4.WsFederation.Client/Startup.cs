@@ -43,7 +43,6 @@ namespace IdentityServer4.WsFederation.Client
         {
             if (env.IsDevelopment())
             {
-                app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
             }
             else

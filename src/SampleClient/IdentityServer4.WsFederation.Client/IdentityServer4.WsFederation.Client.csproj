@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.10" />
+    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.11" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.WsFederation" Version="2.1.2" />
   </ItemGroup>
 
