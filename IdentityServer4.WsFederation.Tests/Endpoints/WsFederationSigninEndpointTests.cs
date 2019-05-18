@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace IdentityServer4.WsFederation.Tests.Endpoints
 {
     [TestClass]
-    public class WsFederationSigninEndpointTests
+    public class WsFederationEndpointSigninTests
     {
         private ClaimsPrincipal _defaultUserPrincipal;
         private ILogger<WsFederationEndpoint> _logger = Substitute.For<ILogger<WsFederationEndpoint>>();
@@ -36,7 +36,7 @@ namespace IdentityServer4.WsFederation.Tests.Endpoints
             _signinValidator.ValidateAsync(default, default).ReturnsForAnyArgs(new WsFederationSigninValidationResult(_validatedRequest));
 
             var defaultAuthTime = DateTimeOffset.UtcNow - TimeSpan.FromSeconds(500);
-            var defaultIdentity = new ClaimsIdentity();
+            var defaultIdentity = new ClaimsIdentity("authmethod");
             defaultIdentity.AddClaim(new Claim("auth_time", defaultAuthTime.ToUnixTimeSeconds().ToString()));
             _defaultUserPrincipal = new ClaimsPrincipal(defaultIdentity);
         }
@@ -86,12 +86,13 @@ namespace IdentityServer4.WsFederation.Tests.Endpoints
             await result.ExecuteAsync(httpContext);
 
             //Assert that the user was redirected to the login page
-            httpContext.Response.Received().RedirectToAbsoluteUrl("http://Login/Url?testParam=%2Fwsfederation%2Fsignin");
+            httpContext.Response.Received().RedirectToAbsoluteUrl("http://Login/Url?testParam=%2Fwsfederation");
         }
 
         [TestMethod]
         public async Task WhenUserIsLoggedIn_SigninResultIsReturned()
         {
+            _userSession.GetUserAsync().ReturnsForAnyArgs(Task.FromResult(_defaultUserPrincipal as ClaimsPrincipal));
             var signinResponse = new WsFederationSigninResponse();
             _responseGenerator.GenerateResponseAsync(_validatedRequest).Returns(signinResponse);
             var endpoint = new WsFederationEndpoint(_logger, _options, _signinValidator, _signoutValidator, _responseGenerator, _userSession);
@@ -106,6 +107,7 @@ namespace IdentityServer4.WsFederation.Tests.Endpoints
         [TestMethod]
         public async Task WhenUserIsLoggedIn_AndAnErrorOccurs_RedirectToErrorPage()
         {
+            _userSession.GetUserAsync().ReturnsForAnyArgs(Task.FromResult(_defaultUserPrincipal as ClaimsPrincipal));
             var signinResponse = new WsFederationSigninResponse();
             signinResponse.Error = "Really bad error.";
             _responseGenerator.GenerateResponseAsync(_validatedRequest).Returns(signinResponse);
@@ -136,7 +138,7 @@ namespace IdentityServer4.WsFederation.Tests.Endpoints
             Assert.IsNotNull(result);
             await result.ExecuteAsync(httpContext);
 
-            httpContext.Response.Received().RedirectToAbsoluteUrl("http://Login/Url?testParam=%2Fwsfederation%2Fsignin");
+            httpContext.Response.Received().RedirectToAbsoluteUrl("http://Login/Url?testParam=%2Fwsfederation");
         }
 
         [TestMethod]
@@ -157,7 +159,7 @@ namespace IdentityServer4.WsFederation.Tests.Endpoints
             Assert.IsNotNull(result);
             await result.ExecuteAsync(httpContext);
 
-            httpContext.Response.Received().RedirectToAbsoluteUrl("http://Login/Url?testParam=%2Fwsfederation%2Fsignin");
+            httpContext.Response.Received().RedirectToAbsoluteUrl("http://Login/Url?testParam=%2Fwsfederation");
         }
 
         [TestMethod]

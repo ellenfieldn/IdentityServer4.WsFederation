@@ -12,7 +12,13 @@ namespace IdentityServer4.WsFederation.Server.Config
             {
                 ClientId = "urn:idsrv4:wsfed:sample",
                 ProtocolType = ProtocolTypes.WsFederation,
-                PostLogoutRedirectUris = { "http://localhost:51214/" },
+                PostLogoutRedirectUris = { "http://localhost:51214/", "http://testredirect/" },
+                RedirectUris = { "http://localhost:51214/signin-wsfed" },
+            },
+            new Client
+            {
+                ClientId = "urn:idsrv4:wsfed:noredirect",
+                ProtocolType = ProtocolTypes.WsFederation,
                 RedirectUris = { "http://localhost:51214/signin-wsfed" },
             }
         };

@@ -135,21 +135,7 @@ namespace IdentityServer4.WsFederation.Tests
             var response = await requestValidator.ValidateAsync(message, null);
             Assert.IsTrue(response.IsError);
             Assert.AreEqual("Unsupported action.", response.Error);
-            Assert.AreEqual($"Only {WsFederationConstants.WsFederationActions.SignIn} is supported at this time.", response.ErrorDescription);
-            Assert.AreEqual(message, response.ValidatedRequest.RequestMessage);
-            Assert.IsNull(response.ValidatedRequest.Subject);
-        }
-
-        [TestMethod]
-        public async Task WaSignout_ReturnsError()
-        {
-            var message = GetDefaultWsFederationMessage();
-            message.Wa = WsFederationConstants.WsFederationActions.SignOut;
-            var requestValidator = new WsFederationSigninValidator(_logger, _clientStore);
-            var response = await requestValidator.ValidateAsync(message, null);
-            Assert.IsTrue(response.IsError);
-            Assert.AreEqual("Unsupported action.", response.Error);
-            Assert.AreEqual($"Only {WsFederationConstants.WsFederationActions.SignIn} is supported at this time.", response.ErrorDescription);
+            Assert.AreEqual("wa=wtf is not supported.", response.ErrorDescription);
             Assert.AreEqual(message, response.ValidatedRequest.RequestMessage);
             Assert.IsNull(response.ValidatedRequest.Subject);
         }

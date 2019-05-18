@@ -71,6 +71,9 @@ namespace IdentityServer4.WsFederation.Validation
                 _logger.LogError("The client identified by the wtrealm does not support WsFederation.", validatedRequest);
                 return new WsFederationSigninValidationResult(validatedRequest, "Invalid protocol.", "The client identified by the wtrealm does not support WsFederation.");
             }
+
+            _logger.LogTrace("WsFederation signin request validation successful.");
+            return new WsFederationSigninValidationResult(validatedRequest);
         }
     }
 }

@@ -38,7 +38,11 @@ namespace IdentityServer4.WsFederation.Validation
                 var client = await _clients.FindEnabledClientByIdAsync(message.Wtrealm);
                 if (client != null)
                 {
-                    if (client.PostLogoutRedirectUris.Contains(message.Wreply))
+                    if (message.Wreply == null)
+                    {
+                        validatedRequest.PostLogOutUri = client.PostLogoutRedirectUris.FirstOrDefault();
+                    }
+                    else if (client.PostLogoutRedirectUris.Contains(message.Wreply))
                     {
                         validatedRequest.PostLogOutUri = message.Wreply;
                     }
@@ -47,6 +51,7 @@ namespace IdentityServer4.WsFederation.Validation
                         _logger.LogError("The passed in redirect url is not valid for the given client.", validatedRequest);
                         return new WsFederationSignoutValidationResult(validatedRequest, "Invalid redirect uri.", "The passed in redirect url is not valid for the given client.");
                     }
+                    return new WsFederationSignoutValidationResult(validatedRequest);
                 }
             }
 
