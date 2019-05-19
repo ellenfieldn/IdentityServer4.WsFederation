@@ -1,4 +1,7 @@
-﻿using System.Text.Encodings.Web;
+﻿// Copyright (c) Nathan Ellenfield. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+
+using System.Text.Encodings.Web;
 
 namespace IdentityServer4.WsFederation.Extensions
 {

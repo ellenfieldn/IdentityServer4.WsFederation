@@ -1,4 +1,7 @@
-﻿using IdentityServer4.WsFederation.Server;
+﻿// Copyright (c) Nathan Ellenfield. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+
+using IdentityServer4.WsFederation.Server;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.IdentityModel.Protocols.WsFederation;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
