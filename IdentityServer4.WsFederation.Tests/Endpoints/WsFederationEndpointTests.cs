@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace IdentityServer4.WsFederation.Tests.Endpoints
 {
     [TestClass]
-    public class WsFederationEndpointSigninTests
+    public class WsFederationEndpointTests
     {
         private ClaimsPrincipal _defaultUserPrincipal;
         private ILogger<WsFederationEndpoint> _logger = Substitute.For<ILogger<WsFederationEndpoint>>();

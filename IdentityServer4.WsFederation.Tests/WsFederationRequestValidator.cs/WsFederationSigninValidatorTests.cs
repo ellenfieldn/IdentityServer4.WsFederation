@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace IdentityServer4.WsFederation.Tests
 {
     [TestClass]
-    public class WsFederationRequestValidatorTests
+    public class WsFederationSigninValidatorTests
     {
         private ILogger<WsFederationSigninValidator> _logger = Substitute.For<ILogger<WsFederationSigninValidator>>();
         private IClientStore _clientStore = Substitute.For<IClientStore>();
@@ -25,7 +25,7 @@ namespace IdentityServer4.WsFederation.Tests
             Wreply = "http://wreply"
         };
 
-        public WsFederationRequestValidatorTests()
+        public WsFederationSigninValidatorTests()
         {
             var goodClient = new Client()
             {

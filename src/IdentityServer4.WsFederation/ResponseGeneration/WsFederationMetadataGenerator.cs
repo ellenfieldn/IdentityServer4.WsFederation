@@ -50,7 +50,7 @@ namespace IdentityServer4.WsFederation
             configuration.KeyInfos.Add(new KeyInfo(configuration.SigningCredentials.Key));
 
             var serializer = new WsFederationMetadataSerializer();
-
+            
             var sb = new StringBuilder();
             var settings = new XmlWriterSettings
             {

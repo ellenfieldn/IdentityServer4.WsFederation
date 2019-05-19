@@ -64,6 +64,16 @@ namespace IdentityServer4.WsFederation.Tests.ResponseGenerator
             return request;
         }
 
+        private string GetTokenString(string rstr)
+        {
+            var doc = XDocument.Parse(rstr);
+            XNamespace wstrust = "http://schemas.xmlsoap.org/ws/2005/02/trust";
+            var requestedTokenElement = doc.Root.Element(wstrust + "RequestedSecurityToken");
+            XNamespace assertionNs = "urn:oasis:names:tc:SAML:2.0:assertion";
+            var assertion = requestedTokenElement.Element(assertionNs + "Assertion");
+            return assertion.ToString(SaveOptions.DisableFormatting);
+        }
+
         [TestMethod]
         public void ResponseContainsRequest()
         {
@@ -157,16 +167,6 @@ namespace IdentityServer4.WsFederation.Tests.ResponseGenerator
             
             handler.ValidateToken(tokenString, validationParams, out var validatedToken);
             Assert.IsNotNull(validatedToken);
-        }
-
-        private string GetTokenString(string rstr)
-        {
-            var doc = XDocument.Parse(rstr);
-            XNamespace wstrust = "http://schemas.xmlsoap.org/ws/2005/02/trust";
-            var requestedTokenElement = doc.Root.Element(wstrust + "RequestedSecurityToken");
-            XNamespace assertionNs = "urn:oasis:names:tc:SAML:2.0:assertion";
-            var assertion = requestedTokenElement.Element(assertionNs + "Assertion");
-            return assertion.ToString(SaveOptions.DisableFormatting);
         }
     }
 }
