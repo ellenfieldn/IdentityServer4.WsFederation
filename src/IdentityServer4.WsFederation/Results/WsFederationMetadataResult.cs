@@ -8,14 +8,8 @@ namespace IdentityServer4.WsFederation
     {
         public string Metadata { get; }
 
-        public WsFederationMetadataResult(string metadata)
-        {
-            Metadata = metadata;
-        }
+        public WsFederationMetadataResult(string metadata) => Metadata = metadata;
 
-        public Task ExecuteAsync(HttpContext context)
-        {
-            return context.Response.WriteAsync(Metadata);
-        }
+        public Task ExecuteAsync(HttpContext context) => context.Response.WriteAsync(Metadata);
     }
 }

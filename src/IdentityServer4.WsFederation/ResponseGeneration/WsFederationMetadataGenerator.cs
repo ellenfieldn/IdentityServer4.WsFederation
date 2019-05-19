@@ -17,6 +17,7 @@ namespace IdentityServer4.WsFederation
         private readonly ILogger _logger;
         private readonly IdentityServerOptions _options;
         private readonly IKeyMaterialService _keys;
+        private static readonly WsFederationMetadataSerializer _serializer = new WsFederationMetadataSerializer();
 
         public WsFederationMetadataGenerator(ILogger<WsFederationMetadataGenerator> logger, IdentityServerOptions options, IKeyMaterialService keys)
         {
@@ -49,8 +50,6 @@ namespace IdentityServer4.WsFederation
             }
             configuration.KeyInfos.Add(new KeyInfo(configuration.SigningCredentials.Key));
 
-            var serializer = new WsFederationMetadataSerializer();
-            
             var sb = new StringBuilder();
             var settings = new XmlWriterSettings
             {
@@ -58,10 +57,9 @@ namespace IdentityServer4.WsFederation
             };
             using(var writer = XmlWriter.Create(sb, settings))
             {
-                serializer.WriteMetadata(writer, configuration);
+                _serializer.WriteMetadata(writer, configuration);
             }
-            var metadata = sb.ToString();
-            return metadata;
+            return sb.ToString();
         }
     }
 }

@@ -1,20 +1,20 @@
-﻿using IdentityServer4.WsFederation.Server;
+﻿using HtmlAgilityPack;
+using IdentityModel;
+using IdentityServer4.Services;
+using IdentityServer4.WsFederation.Server;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NSubstitute;
+using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Security.Claims;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.AspNetCore.Mvc.Filters;
-using HtmlAgilityPack;
-using IdentityServer4.Services;
-using NSubstitute;
-using IdentityModel;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Threading.Tasks;
 
 namespace IdentityServer4.WsFederation.Tests.Functional
 {
@@ -52,6 +52,18 @@ namespace IdentityServer4.WsFederation.Tests.Functional
             public async Task OnAuthorizationAsync(AuthorizationFilterContext context) => context.HttpContext.User = _fakePrincipal;
         }
 
+        public HttpClient GetClientWithFakeUserContext()
+        {
+            var mockSession = Substitute.For<IUserSession>();
+            mockSession.GetUserAsync().Returns(_fakePrincipal);
+            var client = GetClient(services =>
+            {
+                services.AddMvc(o => o.Filters.Add(new FakeUserFilter(_fakePrincipal)));
+                services.AddSingleton(mockSession);
+            });
+            return client;
+        }
+
         [TestMethod]
         public async Task SignoutWithNoContext_Displays_LogoutPage()
         {
@@ -66,13 +78,7 @@ namespace IdentityServer4.WsFederation.Tests.Functional
         [TestMethod]
         public async Task SignoutWithContext_Displays_ConfirmationPage()
         {
-            var mockSession = Substitute.For<IUserSession>();
-            mockSession.GetUserAsync().Returns(_fakePrincipal);
-            var client = GetClient(services =>
-            {
-                services.AddMvc(o => o.Filters.Add(new FakeUserFilter(_fakePrincipal)));
-                services.AddSingleton(mockSession);
-            });
+            var client = GetClientWithFakeUserContext();
             var response = await client.GetAsync("/wsfederation?wa=wsignout1.0&wtrealm=urn:idsrv4:wsfed:sample&wreply=http://testredirect/");
             Assert.AreEqual(HttpStatusCode.Redirect, response.StatusCode);
 
@@ -86,13 +92,7 @@ namespace IdentityServer4.WsFederation.Tests.Functional
         [TestMethod]
         public async Task SignoutWithContext_AndConfirmation_DoesNotRedirectWithNoWreply()
         {
-            var mockSession = Substitute.For<IUserSession>();
-            mockSession.GetUserAsync().Returns(_fakePrincipal);
-            var client = GetClient(services =>
-            {
-                services.AddMvc(o => o.Filters.Add(new FakeUserFilter(_fakePrincipal)));
-                services.AddSingleton(mockSession);
-            });
+            var client = GetClientWithFakeUserContext();
             var response = await client.GetAsync("/wsfederation?wa=wsignout1.0&wtrealm=urn:idsrv4:wsfed:noredirect");
             Assert.AreEqual(HttpStatusCode.Redirect, response.StatusCode);
 
@@ -123,13 +123,7 @@ namespace IdentityServer4.WsFederation.Tests.Functional
         [TestMethod]
         public async Task SignoutWithContext_AndConfirmation_DoesNotRedirectWithInvalidWreply()
         {
-            var mockSession = Substitute.For<IUserSession>();
-            mockSession.GetUserAsync().Returns(_fakePrincipal);
-            var client = GetClient(services =>
-            {
-                services.AddMvc(o => o.Filters.Add(new FakeUserFilter(_fakePrincipal)));
-                services.AddSingleton(mockSession);
-            });
+            var client = GetClientWithFakeUserContext();
             var response = await client.GetAsync("/wsfederation?wa=wsignout1.0&wtrealm=urn:idsrv4:wsfed:noredirect&wreply=http://testredirect/");
             Assert.AreEqual(HttpStatusCode.Redirect, response.StatusCode);
 
@@ -160,13 +154,7 @@ namespace IdentityServer4.WsFederation.Tests.Functional
         [TestMethod]
         public async Task SignoutWithContext_AndConfirmation_RedirectsWithMatchingWreply()
         {
-            var mockSession = Substitute.For<IUserSession>();
-            mockSession.GetUserAsync().Returns(_fakePrincipal);
-            var client = GetClient(services =>
-            {
-                services.AddMvc(o => o.Filters.Add(new FakeUserFilter(_fakePrincipal)));
-                services.AddSingleton(mockSession);
-            });
+            var client = GetClientWithFakeUserContext();
             var response = await client.GetAsync("/wsfederation?wa=wsignout1.0&wtrealm=urn:idsrv4:wsfed:sample&wreply=http://testredirect/");
             Assert.AreEqual(HttpStatusCode.Redirect, response.StatusCode);
 
@@ -197,13 +185,7 @@ namespace IdentityServer4.WsFederation.Tests.Functional
         [TestMethod]
         public async Task SignoutWithContext_AndConfirmation_RedirectsToDefaultWreply()
         {
-            var mockSession = Substitute.For<IUserSession>();
-            mockSession.GetUserAsync().Returns(_fakePrincipal);
-            var client = GetClient(services =>
-            {
-                services.AddMvc(o => o.Filters.Add(new FakeUserFilter(_fakePrincipal)));
-                services.AddSingleton(mockSession);
-            });
+            var client = GetClientWithFakeUserContext();
             var response = await client.GetAsync("/wsfederation?wa=wsignout1.0&wtrealm=urn:idsrv4:wsfed:sample");
             Assert.AreEqual(HttpStatusCode.Redirect, response.StatusCode);
 

@@ -41,23 +41,17 @@ namespace IdentityServer4.WsFederation
             }
         }
 
+        //Process the response by returning a self-submitting form
         private async Task ProcessResponseAsync(HttpContext context)
         {
-            if(!Response.IsError)
-            {
-                await _userSession.AddClientIdAsync(Response.Request.Client.ClientId);
-            }
+            await _userSession.AddClientIdAsync(Response.Request.Client.ClientId);
             var formPost = Response.ResponseMessage.BuildFormPost();
             context.Response.ContentType = "text/html";
             await context.Response.WriteHtmlAsync(formPost);
         }
 
+        //Process the error by redirecting to the error page
         private async Task ProcessErrorAsync(HttpContext context)
-        {
-            await RedirectToErrorPageAsync(context);
-        }
-
-        private async Task RedirectToErrorPageAsync(HttpContext context)
         {
             var errorModel = new ErrorMessage
             {

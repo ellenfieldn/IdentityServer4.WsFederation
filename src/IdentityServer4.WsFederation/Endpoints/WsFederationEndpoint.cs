@@ -56,7 +56,7 @@ namespace IdentityServer4.WsFederation
                 var signoutValidationResult = await _signoutValidator.ValidateAsync(message);
                 return new WsFederationSignoutResult(signoutValidationResult);
             }
-            else
+            else //Sign in validator also handles errors for unsupported wa
             {
                 var validationResult = await _signinValidator.ValidateAsync(message, user);
 
