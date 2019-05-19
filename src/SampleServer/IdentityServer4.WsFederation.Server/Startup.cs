@@ -1,12 +1,15 @@
-﻿using System.Collections.Generic;
+﻿// Copyright (c) Nathan Ellenfield. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+
+using IdentityServer4.Models;
+using IdentityServer4.Quickstart.UI;
 using IdentityServer4.WsFederation.Server.Config;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using IdentityServer4.Models;
-using IdentityServer4.Quickstart.UI;
-using System.Security.Cryptography.X509Certificates;
 using Microsoft.IdentityModel.Tokens;
+using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 
 namespace IdentityServer4.WsFederation.Server
 {
