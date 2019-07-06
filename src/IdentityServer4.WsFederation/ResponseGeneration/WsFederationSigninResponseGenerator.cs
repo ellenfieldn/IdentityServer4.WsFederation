@@ -52,6 +52,16 @@ namespace IdentityServer4.WsFederation
         public async Task<string> GenerateSerializedRstr(ValidatedWsFederationSigninRequest request)
         {
             var now = _clock.UtcNow.UtcDateTime;
+
+            var principal = request.Subject.Identity as ClaimsIdentity;
+            var nameIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier);
+            if (nameIdClaim == null)
+            {
+                nameIdClaim = new Claim(ClaimTypes.NameIdentifier, principal.Name);
+                nameIdClaim.Properties.Add(ClaimProperties.SamlNameIdentifierFormat, Saml2Constants.NameIdentifierFormats.UnspecifiedString);
+                principal.AddClaim(nameIdClaim);
+            }
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Audience = request.RequestMessage.Wtrealm,
@@ -60,8 +70,9 @@ namespace IdentityServer4.WsFederation
                 Issuer = _options.IssuerUri,
                 NotBefore = now,
                 SigningCredentials = await _keys.GetSigningCredentialsAsync(),
-                Subject = request.Subject.Identity as ClaimsIdentity
+                Subject = principal
             };
+            
             //For whatever reason, the Digest method isn't specified in the builder extensions for identity server.
             //Not a good solution to force the user to use th eoverload that takes SigningCredentials
             //IdentityServer4/Configuration/DependencyInjection/BuilderExtensions/Crypto.cs
