@@ -14,6 +14,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Xml.Linq;
@@ -171,5 +172,24 @@ namespace IdentityServer4.WsFederation.Tests.ResponseGenerator
             handler.ValidateToken(tokenString, validationParams, out var validatedToken);
             Assert.IsNotNull(validatedToken);
         }
+
+        [TestMethod]
+        public void RstrHasCorrectDateTimeFormat()
+        {
+            var generator = GetDefaultResponseGenerator();
+            var request = GetDefaultValidatedRequest();
+            var response = generator.GenerateSerializedRstr(request).Result;
+
+            var doc = XDocument.Parse(response);
+            XNamespace wstrust = "http://schemas.xmlsoap.org/ws/2005/02/trust";
+            var lifetimeElement = doc.Root.Element(wstrust + "Lifetime");
+            XNamespace utilityNs = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
+            var created = lifetimeElement.Element(utilityNs + "Created").Value;
+            var expires = lifetimeElement.Element(utilityNs + "Expires").Value;
+
+            DateTime.ParseExact(created, Saml2Constants.AcceptedDateTimeFormats, DateTimeFormatInfo.InvariantInfo, DateTimeStyles.None);
+            DateTime.ParseExact(expires, Saml2Constants.AcceptedDateTimeFormats, DateTimeFormatInfo.InvariantInfo, DateTimeStyles.None);
+        }
     }
 }
+
