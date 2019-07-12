@@ -62,7 +62,7 @@ namespace IdentityServer4.WsFederation.Tests.ResponseGenerator
                     Wreply = "http://example.com/mywreply",
                     Wtrealm = "http://example.com/myrealm"
                 },
-                Subject = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { new Claim(IdentityModel.JwtClaimTypes.Name, "Bob Smith") }))
+                Subject = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim> { new Claim(ClaimTypes.Name, "bob") }))
             };
             request.SetClient(client);
             return request;
@@ -171,6 +171,22 @@ namespace IdentityServer4.WsFederation.Tests.ResponseGenerator
             
             handler.ValidateToken(tokenString, validationParams, out var validatedToken);
             Assert.IsNotNull(validatedToken);
+        }
+
+        [TestMethod]
+        public void GeneratedTokenHasNameId()
+        {
+            var generator = GetDefaultResponseGenerator();
+            var request = GetDefaultValidatedRequest();
+            var response = generator.GenerateSerializedRstr(request).Result;
+
+            var tokenString = GetTokenString(response);
+            var handler = new Saml2SecurityTokenHandler();
+            var token = handler.ReadSaml2Token(tokenString);
+            var nameId = token.Assertion.Subject.NameId;
+
+            Assert.AreEqual("bob", nameId.Value);
+            Assert.AreEqual(Saml2Constants.NameIdentifierFormats.UnspecifiedString, nameId.Format.AbsoluteUri);
         }
 
         [TestMethod]
