@@ -4,6 +4,7 @@
 using IdentityServer4.WsFederation.WsTrust.Entities;
 using Microsoft.IdentityModel.Tokens.Saml2;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 
 namespace IdentityServer4.WsFederation.Tests
 {
@@ -41,8 +42,8 @@ namespace IdentityServer4.WsFederation.Tests
             Assert.IsNotNull(rstr);
 
             Assert.IsNotNull(rstr.Lifetime);
-            Assert.AreEqual("2017-04-23T16:11:17.348Z", rstr.Lifetime.Created);
-            Assert.AreEqual("2017-04-23T17:11:17.348Z", rstr.Lifetime.Expires);
+            Assert.AreEqual(DateTime.Parse("2017-04-23T16:11:17.348Z").ToUniversalTime(), rstr.Lifetime.Created.Value);
+            Assert.AreEqual(DateTime.Parse("2017-04-23T17:11:17.348Z").ToUniversalTime(), rstr.Lifetime.Expires.Value);
 
             Assert.IsNotNull(rstr.AppliesTo);
             Assert.IsNotNull(rstr.AppliesTo.EndpointReference);

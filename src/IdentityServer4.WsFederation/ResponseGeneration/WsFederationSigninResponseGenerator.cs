@@ -21,7 +21,7 @@ namespace IdentityServer4.WsFederation
         private readonly ISystemClock _clock;
         private readonly IdentityServerOptions _options;
         private readonly IKeyMaterialService _keys;
-        
+
         public WsFederationSigninResponseGenerator(ILogger<WsFederationSigninResponseGenerator> logger, ISystemClock clock, IdentityServerOptions options, IKeyMaterialService keys)
         {
             _logger = logger;
@@ -97,11 +97,7 @@ namespace IdentityServer4.WsFederation
             {
                 AppliesTo = new AppliesTo(request.RequestMessage.Wtrealm),
                 KeyType = "http://schemas.xmlsoap.org/ws/2005/05/identity/NoProofKey",
-                Lifetime = new Lifetime
-                {
-                    Created = now.ToString(),
-                    Expires = now.AddSeconds(request.Client.IdentityTokenLifetime).ToString(),
-                },
+                Lifetime = new Lifetime(now, now.AddSeconds(request.Client.IdentityTokenLifetime)),
                 RequestedSecurityToken = token,
                 RequestType = "http://schemas.xmlsoap.org/ws/2005/02/trust/Issue",
                 TokenType = "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0"
