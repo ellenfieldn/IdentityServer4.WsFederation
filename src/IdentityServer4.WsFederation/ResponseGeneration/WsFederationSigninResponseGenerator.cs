@@ -10,7 +10,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols.WsFederation;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.IdentityModel.Tokens.Saml2;
-using System.Globalization;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -22,8 +21,6 @@ namespace IdentityServer4.WsFederation
         private readonly ISystemClock _clock;
         private readonly IdentityServerOptions _options;
         private readonly IKeyMaterialService _keys;
-
-        internal const string GeneratedDateTimeFormat = "yyyy-MM-ddTHH:mm:ss.fffZ";
 
         public WsFederationSigninResponseGenerator(ILogger<WsFederationSigninResponseGenerator> logger, ISystemClock clock, IdentityServerOptions options, IKeyMaterialService keys)
         {
@@ -89,11 +86,7 @@ namespace IdentityServer4.WsFederation
             {
                 AppliesTo = new AppliesTo(request.RequestMessage.Wtrealm),
                 KeyType = "http://schemas.xmlsoap.org/ws/2005/05/identity/NoProofKey",
-                Lifetime = new Lifetime
-                {
-                    Created = now.ToString(GeneratedDateTimeFormat, CultureInfo.InvariantCulture),
-                    Expires = now.AddSeconds(request.Client.IdentityTokenLifetime).ToString(GeneratedDateTimeFormat, CultureInfo.InvariantCulture),
-                },
+                Lifetime = new Lifetime(now, now.AddSeconds(request.Client.IdentityTokenLifetime)),
                 RequestedSecurityToken = token,
                 RequestType = "http://schemas.xmlsoap.org/ws/2005/02/trust/Issue",
                 TokenType = "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0"
